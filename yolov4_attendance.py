@@ -231,7 +231,7 @@ def delete_files(folder):
 # Used for download files from FTP and then classify those images
 def download_files_and_classify_from_FTP(ftp, config, directory, FTP_DIRECTORY, HEIGHT, WIDTH, model, CLASSES, local_folder):
     while True:
-        #try:
+        try:
             ftp.cwd(directory) # Change FTP directory otherwise infinite loop
             list_entry = ftp.nlst()
             for entry in list_entry:
@@ -278,8 +278,8 @@ def download_files_and_classify_from_FTP(ftp, config, directory, FTP_DIRECTORY, 
                 # We don't want to keep the downloaded files
                 delete_files(current_local_dir)
             break
-        #except Exception as e:
-        #    print("Download error, restart")
+        except Exception as e:
+            print("Download error, restart")
 
 # Main function
 def main():
