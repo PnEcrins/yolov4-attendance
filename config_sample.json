@@ -1,0 +1,26 @@
+{
+    "ftp_server": "",
+    "ftp_username": "user",
+    "ftp_password": "mdp",
+    "ftp_directory": "/images_folder",
+    "local_folder": "/home/local_folder",
+    "model_folder": "/home/local_folder/model/yolov4.h5",
+    "treshold": 0.75,
+    "sequence_duration": 10,
+    "time_step": "Hour",
+    "csv_column": {
+        "backpack": "backpack",
+        "bicycle": "bicycle",
+        "dog": "dog",
+        "person": "person",
+        "handbag": "handbag",
+        "ski": "ski",
+        "snowboard": "snowboard",
+        "car": "car",
+        "motorcycle": "motorcycle",
+        "bus": "bus",
+        "horse": "horse",
+        "sheep": "sheep"
+    }
+}
+  
