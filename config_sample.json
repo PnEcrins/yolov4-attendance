@@ -8,6 +8,7 @@
     "treshold": 0.75,
     "sequence_duration": 10,
     "time_step": "Hour",
+    "output_format": "csv",
     "csv_column": {
         "backpack": "backpack",
         "bicycle": "bicycle",
