@@ -64,33 +64,37 @@ def number_of_files(folder):
     return nb_elements
 
 # Used to classify the images
-def classification(folder_pics, nb_elements, HEIGHT, WIDTH, model, CLASSES):
+def classification(folder_pics, nb_elements, HEIGHT, WIDTH, model, CLASSES, classfication_date_file):
     res = []
     count = -1
     for root, dirs, files in os.walk(folder_pics):
         for file in files:
-            if (file.endswith(".jpg")) or (file.endswith(".JPG")) or (file.endswith(".png")) or (file.endswith(".PNG")) or (file.endswith(".jpeg")) or (file.endswith(".JPEG")) :# jpg, png or jpeg
-                count+=1
-                if count%10 == 0:
-                    print(f"{nb_elements-count} more images to classify")
-                        
-                try:
-                    where = os.path.join(root, file)
-                    image = tf.io.read_file(where)
+            # If the image modification date is less than the last classification date, then we have already classified it
+            if not already_classify(os.path.join(root, file), get_last_classification_date(classfication_date_file)):
+                if (file.endswith(".jpg")) or (file.endswith(".JPG")) or (file.endswith(".png")) or (file.endswith(".PNG")) or (file.endswith(".jpeg")) or (file.endswith(".JPEG")) :# jpg, png or jpeg
+                    count+=1
+                    if count%10 == 0:
+                        print(f"{nb_elements-count} more images to classify")
+                                
+                    try:
+                        where = os.path.join(root, file)
+                        image = tf.io.read_file(where)
 
-                    image = tf.image.decode_image(image)
-                    image = tf.image.resize(image, (HEIGHT, WIDTH))
-                    images = tf.expand_dims(image, axis=0) / 255.0
-                except Exception as e:
-                    print("A corrupted image was ignored")
-                        
-                # Predictions
-                boxes, scores, classes, valid_detections = model.predict(images)
-                            
-                # Save results
-                for i, j in zip(classes[0].tolist(), scores[0].tolist()):
-                    if j > 0:
-                        res.append([CLASSES[int(i)],j,where])
+                        image = tf.image.decode_image(image)
+                        image = tf.image.resize(image, (HEIGHT, WIDTH))
+                        images = tf.expand_dims(image, axis=0) / 255.0
+                    except Exception as e:
+                        print("A corrupted image was ignored")
+                                
+                    # Predictions
+                    boxes, scores, classes, valid_detections = model.predict(images)
+                                    
+                    # Save results
+                    for i, j in zip(classes[0].tolist(), scores[0].tolist()):
+                        if j > 0:
+                            res.append([CLASSES[int(i)],j,where])
+    # We save the classification date
+    set_last_classification_date(classfication_date_file, datetime.now())
     return res
 
 # Used to round off dates
@@ -228,8 +232,31 @@ def delete_files(folder):
     except Exception as e:
         print(f"Unexpected error when deleting directory {folder}")
 
+# Used to get the last classification date
+def get_last_classification_date(file_path):
+    if not os.path.exists(file_path):
+        with open(file_path, 'w') as file:
+            file.write('1900-01-01') # reference date in case first classification
+    with open(file_path, 'r') as file:
+        last_classification_date_str = file.read()
+        try:
+            last_classification_date = datetime.strptime(last_classification_date_str, '%Y-%m-%d')
+            return last_classification_date
+        except ValueError:
+            return None
+
+# Used to set the classification date in the file
+def set_last_classification_date(file_path, classification_date):
+    with open(file_path, 'w') as file:
+        file.write(classification_date.strftime('%Y-%m-%d'))
+
+# Used to know if we have already classify this image or not
+def already_classify(image, last_classification_date):
+    image_modification_date = datetime.fromtimestamp(os.path.getmtime(image))
+    return image_modification_date < last_classification_date
+
 # Used for download files from FTP and then classify those images
-def download_files_and_classify_from_FTP(ftp, config, directory, FTP_DIRECTORY, HEIGHT, WIDTH, model, CLASSES, local_folder):
+def download_files_and_classify_from_FTP(ftp, config, directory, FTP_DIRECTORY, HEIGHT, WIDTH, model, CLASSES, local_folder, classfication_date_file):
     while True:
         try:
             ftp.cwd(directory) # Change FTP directory otherwise infinite loop
@@ -238,13 +265,13 @@ def download_files_and_classify_from_FTP(ftp, config, directory, FTP_DIRECTORY, 
                 # If there's no dot, it's a folder
                 if '.' in entry:
                     image = entry # Entry is a file, for us an image
-                    
+
                     # Create directory to store images
                     try:
                         directory_path = f"{os.getcwd()}/{directory.split('/')[2]}/{directory.split('/')[3]}"
                     except Exception as e:
                         directory_path = f"{os.getcwd()}/{directory.split('/')[2]}"
-                    
+                        
                     if not os.path.exists(directory_path):
                         os.makedirs(directory_path)
                     local_filename = os.path.join(directory_path, image)
@@ -256,14 +283,14 @@ def download_files_and_classify_from_FTP(ftp, config, directory, FTP_DIRECTORY, 
                 else:
                     # Recursive call to browse subdirectories
                     sub_directory = f"{directory}/{entry}"
-                    download_files_and_classify_from_FTP(ftp, config, sub_directory, FTP_DIRECTORY, HEIGHT, WIDTH, model, CLASSES, local_folder)
+                    download_files_and_classify_from_FTP(ftp, config, sub_directory, FTP_DIRECTORY, HEIGHT, WIDTH, model, CLASSES, local_folder, classfication_date_file)
                     os.chdir(local_folder) # Return to the main local directory
             # If the directory is different than FTP_DIRECTORY and equal to the level one sub-directory of FTP_DIRECTORY we process
             if (directory != FTP_DIRECTORY) and (directory == f"{FTP_DIRECTORY}/{directory.split('/')[2]}"):
                 current_local_dir = os.path.join(os.getcwd(), directory.split('/')[2])
                 os.chdir(current_local_dir)
                 nb_elements = number_of_files(current_local_dir)
-                res = classification(current_local_dir, nb_elements, HEIGHT, WIDTH, model, CLASSES)
+                res = classification(current_local_dir, nb_elements, HEIGHT, WIDTH, model, CLASSES, classfication_date_file)
                 dataframe_metadonnees = pd.DataFrame(load_metadata(current_local_dir))
                 dataframe = processing_output(config, dataframe_metadonnees, res)
                 # Export
@@ -373,13 +400,13 @@ def main():
 ###############
 
     start = timeit.default_timer()
-    
+    classfication_date_file = os.path.join(os.getcwd(), "last_classification_date.txt")
     if Use_FTP:
-        download_files_and_classify_from_FTP(ftp, config, FTP_DIRECTORY, FTP_DIRECTORY, HEIGHT, WIDTH, model, CLASSES, local_folder)
+        download_files_and_classify_from_FTP(ftp, config, FTP_DIRECTORY, FTP_DIRECTORY, HEIGHT, WIDTH, model, CLASSES, local_folder, classfication_date_file)
         ftp.quit()
     else:
         nb_elements = number_of_files(local_folder)
-        res = classification(local_folder, nb_elements, HEIGHT, WIDTH, model, CLASSES)
+        res = classification(local_folder, nb_elements, HEIGHT, WIDTH, model, CLASSES, classfication_date_file)
         dataframe_metadonnees = pd.DataFrame(load_metadata(local_folder))
         dataframe = processing_output(config, dataframe_metadonnees, res)
         # Export to DAT
