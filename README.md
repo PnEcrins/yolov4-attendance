@@ -17,10 +17,6 @@ git clone git@github.com:PnEcrins/yolov4-attendance.git
 Ensuite, vous avez besoin de récupérer le fichier des paramètres du modèle re-entrainé par Mathieu Garel et de le déposer dans le répertoire *model*. Il est disponible à cette adresse :
 [Modèle réentrainé](http://mathieu.garel.free.fr/yolo/yolov4.h5)
 
-```
-git clone git@github.com:PnEcrins/yolov4-attendance.git
-```
-
 Une fois le modèle récupéré, il vous faut créer votre version du fichier de config.
 
 ```
