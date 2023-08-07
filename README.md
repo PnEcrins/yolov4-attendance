@@ -1,4 +1,4 @@
-# YoloV4_attendance
+# yoloV4_attendance
 
 Script de classification automatique d'images basé sur le modèle [yolov4](https://github.com/AlexeyAB/darknet).
 
@@ -15,7 +15,7 @@ git clone git@github.com:PnEcrins/yolov4-attendance.git
 ```
 
 Ensuite, vous avez besoin de récupérer le fichier des paramètres du modèle re-entrainé par Mathieu Garel et de le déposer dans le répertoire *model*. Il est disponible à cette adresse :
-[Modèle réentrainé](http://mathieu.garel.free.fr/yolo/yolov4.h5)
+[:link: Modèle réentrainé](http://mathieu.garel.free.fr/yolo/yolov4.h5)
 
 Une fois le modèle récupéré, il vous faut créer votre version du fichier de config.
 
