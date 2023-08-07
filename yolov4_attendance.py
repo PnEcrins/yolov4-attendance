@@ -408,14 +408,25 @@ def main():
         download_files_and_classify_from_FTP(ftp, config, FTP_DIRECTORY, FTP_DIRECTORY, HEIGHT, WIDTH, model, CLASSES, local_folder, output_folder, classfication_date_file)
         ftp.quit()
     else:
-        nb_elements = number_of_files(local_folder)
-        res = classification(local_folder, nb_elements, HEIGHT, WIDTH, model, CLASSES, classfication_date_file)
-        dataframe_metadonnees = pd.DataFrame(load_metadata(local_folder))
-        dataframe = processing_output(config, dataframe_metadonnees, res)
-        # Export to DAT
-        timestr = time.strftime("%Y%m%d%H%M%S000") # unique name based on date.time
-        dataframe.to_csv(f'{output_folder}/yoloV4_attendance_{timestr}.dat', index=True)
-
+        # We browse our local directory and run classification once for each subfolder
+        for root, dirs, files in os.walk(local_folder):
+            for dir in dirs:
+                # Classification on level 1 subdirectories only
+                if root == local_folder:
+                    current_path_dir = os.path.join(root, dir)
+                    nb_elements = number_of_files(current_path_dir)
+                    res = classification(current_path_dir, nb_elements, HEIGHT, WIDTH, model, CLASSES, classfication_date_file)
+                    dataframe_metadonnees = pd.DataFrame(load_metadata(current_path_dir))
+                    dataframe = processing_output(config, dataframe_metadonnees, res)
+                    # Export to output format
+                    timestr = time.strftime("%Y%m%d%H%M%S000") # unique name based on date.time
+                    if config['output_format']=="csv":
+                        dataframe.to_csv(f'{output_folder}/{dir}_{timestr}.csv', index=True)
+                    elif config['output_format']=="dat":
+                        dataframe.to_csv(f'{output_folder}/{dir}_{timestr}.dat', index=True)
+                    else: # default case CSV
+                        dataframe.to_csv(f'{output_folder}/{dir}_{timestr}.csv', index=True)
+                                   
     stop = timeit.default_timer()
     print('Computing time: ', stop - start) # get an idea of computing time
 
