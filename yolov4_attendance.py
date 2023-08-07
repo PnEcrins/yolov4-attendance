@@ -6,6 +6,7 @@ import os
 import json
 import timeit
 import time
+import pytz
 from datetime import datetime
 
 import tensorflow as tf
@@ -98,21 +99,27 @@ def classification(folder_pics, nb_elements, HEIGHT, WIDTH, model, CLASSES, clas
     return res
 
 # Used to round off dates
-def arrondir_date(dt, periode):
+def arrondir_date(dt, periode, tz):
     reference_date = datetime(2023, 1, 1, 00, 00, 00)
     date = dt - (dt - reference_date) % periode
+    date = tz.localize(date)
     return date.isoformat()
 
 # Used to round off dates : monthly time step
-def arrondir_date_month(dt):
-    return pd.Timestamp(dt.year, dt.month, 1).normalize().isoformat()
+def arrondir_date_month(dt, tz):
+    date = pd.Timestamp(dt.year, dt.month, 1).normalize()
+    date = tz.localize(date)
+    return date.isoformat()
 
 # Used to round off dates : annual time step
-def arrondir_date_year(dt):
-    return pd.Timestamp(dt.year, 1, 1).normalize().isoformat()
+def arrondir_date_year(dt, tz):
+    date = pd.Timestamp(dt.year, 1, 1).normalize()
+    date = tz.localize(date)
+    return date.isoformat()
 
 # Used to transform the output csv of the classification model into a more usable csv
 def processing_output(config, dataframe_metadonnees, res):
+    tz = pytz.timezone("Europe/Paris")
     dataframe_yolo = pd.DataFrame(res, columns=['class', 'score', 'photo'])
     # Changing paths to image names for merge
     dataframe_metadonnees['photo'] = dataframe_metadonnees['photo'].str.rsplit('/', n=1).str[-1]
@@ -197,18 +204,18 @@ def processing_output(config, dataframe_metadonnees, res):
     # Creation of a new column with dates rounded according to time step
     if config['time_step']=='Hour':
         periode = pd.offsets.Hour()
-        comptage_df[config['csv_column']['date']] = comptage_df['DateTimeOriginal'].apply(lambda dt: arrondir_date(dt, periode))
+        comptage_df[config['csv_column']['date']] = comptage_df['DateTimeOriginal'].apply(lambda dt: arrondir_date(dt, periode, tz))
     elif config['time_step']=='Day':
         periode = pd.offsets.Day()
-        comptage_df[config['csv_column']['date']] = comptage_df['DateTimeOriginal'].apply(lambda dt: arrondir_date(dt, periode))
+        comptage_df[config['csv_column']['date']] = comptage_df['DateTimeOriginal'].apply(lambda dt: arrondir_date(dt, periode, tz))
     elif config['time_step']=='Month':
-        comptage_df[config['csv_column']['date']] = comptage_df['DateTimeOriginal'].apply(arrondir_date_month)
+        comptage_df[config['csv_column']['date']] = comptage_df['DateTimeOriginal'].apply(lambda dt: arrondir_date_month(dt, tz))
     elif config['time_step']=='Year':
-        comptage_df[config['csv_column']['date']] = comptage_df['DateTimeOriginal'].apply(arrondir_date_year)
+        comptage_df[config['csv_column']['date']] = comptage_df['DateTimeOriginal'].apply(lambda dt: arrondir_date_year(dt, tz))
     else: # To avoid a bug, we define the default time step as hour
         print("Error reading value for time_step from config file. Set to basic value, hour.")
         periode = pd.offsets.Hour()
-        comptage_df[config['csv_column']['date']] = comptage_df['DateTimeOriginal'].apply(arrondir_date(periode))
+        comptage_df[config['csv_column']['date']] = comptage_df['DateTimeOriginal'].apply(lambda dt: arrondir_date(dt, periode, tz))
 
     # Delete the DateTimeOriginal field we no longer need
     comptage_df.drop('DateTimeOriginal', axis=1, inplace=True)
