@@ -421,16 +421,18 @@ def main():
                     current_path_dir = os.path.join(root, dir)
                     nb_elements = number_of_files(current_path_dir)
                     res = classification(current_path_dir, nb_elements, HEIGHT, WIDTH, model, CLASSES, classfication_date_file)
-                    dataframe_metadonnees = pd.DataFrame(load_metadata(current_path_dir))
-                    dataframe = processing_output(config, dataframe_metadonnees, res)
-                    # Export to output format
-                    timestr = time.strftime("%Y%m%d%H%M%S000") # unique name based on date.time
-                    if config['output_format']=="csv":
-                        dataframe.to_csv(f'{output_folder}/{dir}_{timestr}.csv', index=True)
-                    elif config['output_format']=="dat":
-                        dataframe.to_csv(f'{output_folder}/{dir}_{timestr}.dat', index=True)
-                    else: # default case CSV
-                        dataframe.to_csv(f'{output_folder}/{dir}_{timestr}.csv', index=True)
+                    # Avoid to create empty output files
+                    if res==[]:
+                        dataframe_metadonnees = pd.DataFrame(load_metadata(current_path_dir))
+                        dataframe = processing_output(config, dataframe_metadonnees, res)
+                        # Export to output format
+                        timestr = time.strftime("%Y%m%d%H%M%S000") # unique name based on date.time
+                        if config['output_format']=="csv":
+                            dataframe.to_csv(f'{output_folder}/{dir}_{timestr}.csv', index=True)
+                        elif config['output_format']=="dat":
+                            dataframe.to_csv(f'{output_folder}/{dir}_{timestr}.dat', index=True)
+                        else: # default case CSV
+                            dataframe.to_csv(f'{output_folder}/{dir}_{timestr}.csv', index=True)
 
     # We save the classification date
     set_last_classification_date(classfication_date_file, datetime.now())
