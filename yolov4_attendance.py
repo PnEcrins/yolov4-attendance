@@ -197,23 +197,23 @@ def processing_output(config, dataframe_metadonnees, res):
     # Creation of a new column with dates rounded according to time step
     if config['time_step']=='Hour':
         periode = pd.offsets.Hour()
-        comptage_df['date_arrondie'] = comptage_df['DateTimeOriginal'].apply(lambda dt: arrondir_date(dt, periode))
+        comptage_df[config['csv_column']['date']] = comptage_df['DateTimeOriginal'].apply(lambda dt: arrondir_date(dt, periode))
     elif config['time_step']=='Day':
         periode = pd.offsets.Day()
-        comptage_df['date_arrondie'] = comptage_df['DateTimeOriginal'].apply(lambda dt: arrondir_date(dt, periode))
+        comptage_df[config['csv_column']['date']] = comptage_df['DateTimeOriginal'].apply(lambda dt: arrondir_date(dt, periode))
     elif config['time_step']=='Month':
-        comptage_df['date_arrondie'] = comptage_df['DateTimeOriginal'].apply(arrondir_date_month)
+        comptage_df[config['csv_column']['date']] = comptage_df['DateTimeOriginal'].apply(arrondir_date_month)
     elif config['time_step']=='Year':
-        comptage_df['date_arrondie'] = comptage_df['DateTimeOriginal'].apply(arrondir_date_year)
+        comptage_df[config['csv_column']['date']] = comptage_df['DateTimeOriginal'].apply(arrondir_date_year)
     else: # To avoid a bug, we define the default time step as hour
         print("Error reading value for time_step from config file. Set to basic value, hour.")
         periode = pd.offsets.Hour()
-        comptage_df['date_arrondie'] = comptage_df['DateTimeOriginal'].apply(arrondir_date(periode))
+        comptage_df[config['csv_column']['date']] = comptage_df['DateTimeOriginal'].apply(arrondir_date(periode))
 
     # Delete the DateTimeOriginal field we no longer need
     comptage_df.drop('DateTimeOriginal', axis=1, inplace=True)
     # Concatenation of date_rounded to have only one entry per sequence
-    comptage_df = comptage_df.groupby('date_arrondie').sum()
+    comptage_df = comptage_df.groupby(config['csv_column']['date']).sum()
     # Delete entries with all values 0 (except index) to simplify the file
     #comptage_df = comptage_df[(comptage_df.loc[:, ~(comptage_df.columns == "date_arrondie")] != 0).any(axis=1)]
     return comptage_df

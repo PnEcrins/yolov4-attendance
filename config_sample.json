@@ -11,6 +11,7 @@
     "time_step": "Hour",
     "output_format": "csv",
     "csv_column": {
+        "date": "date",
         "backpack": "backpack",
         "bicycle": "bicycle",
         "dog": "dog",
