@@ -17,10 +17,6 @@ git clone git@github.com:PnEcrins/yolov4-attendance.git
 Ensuite, vous avez besoin de récupérer le fichier des paramètres du modèle re-entrainé par Mathieu Garel et de le déposer dans le répertoire *model*. Il est disponible à cette adresse :
 [Modèle réentrainé](http://mathieu.garel.free.fr/yolo/yolov4.h5)
 
-```
-git clone git@github.com:PnEcrins/yolov4-attendance.git
-```
-
 Une fois le modèle récupéré, il vous faut créer votre version du fichier de config.
 
 ```
@@ -36,7 +32,8 @@ Dans ce cas, la classification se fera via le répertoire local indiqué dans lo
 **ftp_directory :** Répertoire contenant les images sur le serveur FTP  
 **local_folder :** En mode FTP, il s'agit du répertoire dans lequel les images seront téléchargées puis classifiées puis supprimées.   
 En mode local, il s'agit du répertoire contenant les images à classifier  
-**model_folder :** Chemin d'accès au fichier .h5 du modèle  
+**output_folder :** Répertoire dans lequel les fichiers de sortie seront stockés  
+**model_file :** Chemin d'accès au fichier .h5 du modèle  
 **treshold :** Valeur du seuil de classification pour le modèle. Cette valeur varie de 0 à 1. Plus la valeur est basse, plus nous sommes permissifs avec les classifications. Plus la valeur est haute, plus nous sommes restrictifs avec les classifications.  
 **sequence_duration :** Valeur (en secondes) du temps de séquence. Le temps de séquence est utilisé par le script pour compter les groupes d'individus. Lors de la classification de l'image n, si l'image n-1 a été classifiée il y a moins du temps de séquence choisi alors le script considère qu'il s'agit du même groupe d'individus et donc il ne compte pas deux fois ce groupe.  
 La valeur de base est de 10 secondes. Selon la fréquentation de votre sentier, vous pouvez baisser jusqu'à 5 s'il est très fréquenté et monter jusqu'à 15 s'il est très peu fréquenté. Au-delà de cet intervalle, les résultats sont moins bons.  

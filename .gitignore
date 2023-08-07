@@ -1,7 +1,6 @@
 config.json
+last_classification_date.txt
 venv/*
+output/*
 yolov4_attendance.egg-info/*
-model/coco.data
-model/haarcascade_frontalface_default.xml
-model/yolov4.cfg
-model/yolov4.h5
+model/*

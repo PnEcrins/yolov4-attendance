@@ -256,7 +256,7 @@ def already_classify(image, last_classification_date):
     return image_modification_date < last_classification_date
 
 # Used for download files from FTP and then classify those images
-def download_files_and_classify_from_FTP(ftp, config, directory, FTP_DIRECTORY, HEIGHT, WIDTH, model, CLASSES, local_folder, classfication_date_file):
+def download_files_and_classify_from_FTP(ftp, config, directory, FTP_DIRECTORY, HEIGHT, WIDTH, model, CLASSES, local_folder, output_folder, classfication_date_file):
     while True:
         try:
             ftp.cwd(directory) # Change FTP directory otherwise infinite loop
@@ -283,7 +283,7 @@ def download_files_and_classify_from_FTP(ftp, config, directory, FTP_DIRECTORY, 
                 else:
                     # Recursive call to browse subdirectories
                     sub_directory = f"{directory}/{entry}"
-                    download_files_and_classify_from_FTP(ftp, config, sub_directory, FTP_DIRECTORY, HEIGHT, WIDTH, model, CLASSES, local_folder, classfication_date_file)
+                    download_files_and_classify_from_FTP(ftp, config, sub_directory, FTP_DIRECTORY, HEIGHT, WIDTH, model, CLASSES, local_folder, output_folder, classfication_date_file)
                     os.chdir(local_folder) # Return to the main local directory
             # If the directory is different than FTP_DIRECTORY and equal to the level one sub-directory of FTP_DIRECTORY we process
             if (directory != FTP_DIRECTORY) and (directory == f"{FTP_DIRECTORY}/{directory.split('/')[2]}"):
@@ -297,11 +297,11 @@ def download_files_and_classify_from_FTP(ftp, config, directory, FTP_DIRECTORY, 
                 timestr = time.strftime("%Y%m%d%H%M%S000") # unique name based on date.time
                 procedure = directory.split('/')[2]
                 if config['output_format']=="csv":
-                    dataframe.to_csv(f'{local_folder}/{procedure}_{timestr}.csv', index=True)
+                    dataframe.to_csv(f'{output_folder}/{procedure}_{timestr}.csv', index=True)
                 elif config['output_format']=="dat":
-                    dataframe.to_csv(f'{local_folder}/{procedure}_{timestr}.dat', index=True)
+                    dataframe.to_csv(f'{output_folder}/{procedure}_{timestr}.dat', index=True)
                 else: # default case CSV
-                    dataframe.to_csv(f'{local_folder}/{procedure}_{timestr}.csv', index=True)
+                    dataframe.to_csv(f'{output_folder}/{procedure}_{timestr}.csv', index=True)
                 # We don't want to keep the downloaded files
                 delete_files(current_local_dir)
             break
@@ -349,8 +349,11 @@ def main():
     # Folder path with pictures
     local_folder = config['local_folder']
 
+    # Folder path for outputs
+    output_folder = config['output_folder']
+
     # Folder with the model
-    folder_model = config['model_folder']
+    folder_model = config['model_file']
 
     # Threshold for classification
     try:
@@ -402,7 +405,7 @@ def main():
     start = timeit.default_timer()
     classfication_date_file = os.path.join(os.getcwd(), "last_classification_date.txt")
     if Use_FTP:
-        download_files_and_classify_from_FTP(ftp, config, FTP_DIRECTORY, FTP_DIRECTORY, HEIGHT, WIDTH, model, CLASSES, local_folder, classfication_date_file)
+        download_files_and_classify_from_FTP(ftp, config, FTP_DIRECTORY, FTP_DIRECTORY, HEIGHT, WIDTH, model, CLASSES, local_folder, output_folder, classfication_date_file)
         ftp.quit()
     else:
         nb_elements = number_of_files(local_folder)
@@ -411,7 +414,7 @@ def main():
         dataframe = processing_output(config, dataframe_metadonnees, res)
         # Export to DAT
         timestr = time.strftime("%Y%m%d%H%M%S000") # unique name based on date.time
-        dataframe.to_csv(f'{local_folder}/yoloV4_attendance_{timestr}.dat', index=True)
+        dataframe.to_csv(f'{output_folder}/yoloV4_attendance_{timestr}.dat', index=True)
 
     stop = timeit.default_timer()
     print('Computing time: ', stop - start) # get an idea of computing time
