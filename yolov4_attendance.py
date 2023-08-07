@@ -94,8 +94,6 @@ def classification(folder_pics, nb_elements, HEIGHT, WIDTH, model, CLASSES, clas
                     for i, j in zip(classes[0].tolist(), scores[0].tolist()):
                         if j > 0:
                             res.append([CLASSES[int(i)],j,where])
-    # We save the classification date
-    set_last_classification_date(classfication_date_file, datetime.now())
     return res
 
 # Used to round off dates
@@ -433,7 +431,10 @@ def main():
                         dataframe.to_csv(f'{output_folder}/{dir}_{timestr}.dat', index=True)
                     else: # default case CSV
                         dataframe.to_csv(f'{output_folder}/{dir}_{timestr}.csv', index=True)
-                                   
+
+    # We save the classification date
+    set_last_classification_date(classfication_date_file, datetime.now())
+
     stop = timeit.default_timer()
     print('Computing time: ', stop - start) # get an idea of computing time
 
