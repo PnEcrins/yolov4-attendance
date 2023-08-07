@@ -1,5 +1,6 @@
 config.json
 last_classification_date.txt
 venv/*
+output/*
 yolov4_attendance.egg-info/*
 model/*
