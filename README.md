@@ -1,10 +1,10 @@
-# yoloV4_attendance
+# YOLOv4_attendance
 
-Script de classification automatique d'images basé sur le modèle [yolov4](https://github.com/AlexeyAB/darknet).
+Script de classification automatique d'images basé sur le modèle [YOLOv4](https://github.com/AlexeyAB/darknet).
 
 ## Description
 
-Ce script utilise le modèle de classification [yolov4](https://github.com/AlexeyAB/darknet) pour classifier des images provenant d'un serveur FTP ou d'un répertoire local. À savoir que le modèle yolov4 a été re-entrainé par Mathieu Garel de l'Office français de la biodiversité pour le rendre plus performant dans le suivi de la fréquentation.
+Ce script utilise le modèle de classification [yolov4](https://github.com/AlexeyAB/darknet) pour classifier des images provenant d'un serveur FTP ou d'un répertoire local. À savoir que le modèle YOLOv4 a été re-entrainé par Mathieu Garel de l'Office français de la biodiversité pour le rendre plus performant dans le suivi de la fréquentation.
 
 Ce script permet ainsi de compter des nombres de personnes sur des images, notamment dans le cadre de suivis de la fréquentation réalisés avec des pièges photos à déclenchement automatique.
 
