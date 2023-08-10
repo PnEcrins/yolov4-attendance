@@ -118,10 +118,16 @@ def arrondir_date_year(dt, tz):
 # Used to transform the output csv of the classification model into a more usable csv
 def processing_output(config, dataframe_metadonnees, res):
     tz = pytz.timezone("Europe/Paris")
+
     dataframe_yolo = pd.DataFrame(res, columns=['class', 'score', 'photo'])
-    # Changing paths to image names for merge
-    dataframe_metadonnees['photo'] = dataframe_metadonnees['photo'].str.rsplit('/', n=1).str[-1]
-    dataframe_yolo['photo'] = dataframe_yolo['photo'].str.rsplit('/', n=1).str[-1]
+    try:
+        # Changing paths to image names for merge
+        dataframe_metadonnees['photo'] = dataframe_metadonnees['photo'].str.rsplit('/', n=1).str[-1]
+        dataframe_yolo['photo'] = dataframe_yolo['photo'].str.rsplit('/', n=1).str[-1]
+    except Exception as e:
+        print("Error when reading dataframe_yolo, it's mean there is no image in the folder so we skip output production")
+        return None
+
     # Merging dataframes
     merged_df = dataframe_metadonnees.merge(dataframe_yolo[['photo', 'class']], on='photo', how='left')
     # Add new fieldscsv_columncsv_column
@@ -422,7 +428,7 @@ def main():
                     nb_elements = number_of_files(current_path_dir)
                     res = classification(current_path_dir, nb_elements, HEIGHT, WIDTH, model, CLASSES, classfication_date_file)
                     # Avoid to create empty output files
-                    if res==[]:
+                    if res!=[]:
                         dataframe_metadonnees = pd.DataFrame(load_metadata(current_path_dir))
                         dataframe = processing_output(config, dataframe_metadonnees, res)
                         # Export to output format
