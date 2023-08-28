@@ -1,12 +1,12 @@
 # YOLOv4_attendance
 
-Script de classification automatique d'images basé sur le modèle [YOLOv4](https://github.com/AlexeyAB/darknet).
+Script de détection automatique d'objets (ici les "humains") dans des images, basé sur le modèle [YOLOv4](https://github.com/AlexeyAB/darknet) entrainé sur le jeu de données [COCO](https://cocodataset.org/#home).
 
 ## Description
 
-Ce script utilise le modèle de classification [yolov4](https://github.com/AlexeyAB/darknet) pour classifier des images provenant d'un serveur FTP ou d'un répertoire local. À savoir que le modèle YOLOv4 a été re-entrainé par Mathieu Garel de l'Office français de la biodiversité pour le rendre plus performant dans le suivi de la fréquentation.
+Ce script utilise le modèle de réseau de neurones [yolov4](https://github.com/AlexeyAB/darknet) pour détecter des objets dans des images provenant d'un serveur FTP ou d'un répertoire local.
 
-Ce script permet ainsi de compter des nombres de personnes sur des images, notamment dans le cadre de suivis de la fréquentation réalisés avec des pièges photos à déclenchement automatique.
+Ce script permet ainsi de compter automatiquement, sans visualisation par l'utilisateur, le nombre de personnes présentes sur des images, notamment dans le cadre de suivis de la fréquentation réalisés avec des pièges photos à déclenchement automatique. Le script compte le nombre maximum d'humains au sein de chaque séquence, retenu comme taille de groupe.
 
 ## Installation
 
@@ -16,8 +16,8 @@ Commencez par cloner le dépôt git.
 git clone git@github.com:PnEcrins/yolov4-attendance.git
 ```
 
-Ensuite, vous avez besoin de récupérer le fichier des paramètres du modèle re-entrainé par Mathieu Garel et de le déposer dans le répertoire `/model`. Il est disponible à cette adresse :
-[:link: Modèle réentrainé](http://mathieu.garel.free.fr/yolo/yolov4.h5)
+Ensuite, vous avez besoin de récupérer le fichier des paramètres du modèle et de le déposer dans le répertoire `/model`. Il est disponible à cette adresse :
+[:link: Modèle](http://mathieu.garel.free.fr/yolo/yolov4.h5)
 
 Une fois le modèle récupéré, il vous faut créer votre version du fichier de configuration.
 
@@ -68,3 +68,9 @@ python3 yolov4_attendance.py
 ```
 
 N'oubliez pas de créer/modifier votre fichier de config !
+
+## Auteurs
+
+* Mathieu Garel (OFB)
+* Aurélien Coste (Parc national des Ecrins)
+* Théo Lechémia (Parc national des Ecrins)
