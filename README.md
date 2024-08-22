@@ -2,6 +2,8 @@
 
 Script de détection automatique d'objets (ici les "humains") dans des images, basé sur le modèle [YOLOv4](https://github.com/AlexeyAB/darknet) entrainé sur le jeu de données [COCO](https://cocodataset.org/#home).
 
+Le projet a été enrichi et amélioré depuis sur l'organisation https://github.com/orgs/Attendance-PNE-OFB/repositories.
+
 ## Description
 
 Ce script utilise le modèle de réseau de neurones [yolov4](https://github.com/AlexeyAB/darknet) pour détecter des objets dans des images provenant d'un serveur FTP ou d'un répertoire local.
